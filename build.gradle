@@ -3,7 +3,7 @@ plugins {
     id 'fabric-loom' version '1.10-SNAPSHOT'
 }
 
-version = '8.0.0-fabric'
+version = '8.0.0a-fabric'
 group = 'me.paulf.fairylights'
 archivesBaseName = 'fairylights'
 
