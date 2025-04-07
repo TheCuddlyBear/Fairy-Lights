@@ -14,8 +14,10 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.IntUnaryOperator;
@@ -38,7 +40,7 @@ public final class GenericRecipe extends CustomRecipe {
 
     private final int outputIngredient;
 
-    private ItemStack result = ItemStack.EMPTY;
+    private ItemStack result = new ItemStack(Items.ACACIA_SLAB);
 
     private final ImmutableList<IntUnaryOperator> xFunctions = ImmutableList.of(IntUnaryOperator.identity(), i -> this.getWidth() - 1 - i);
 
@@ -102,7 +104,7 @@ public final class GenericRecipe extends CustomRecipe {
 
     @Override
     public boolean isSpecial() {
-        return this.output.isEmpty();
+        return true;
     }
 
     @Override
@@ -131,7 +133,7 @@ public final class GenericRecipe extends CustomRecipe {
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients() {
+    public @NotNull NonNullList<Ingredient> getIngredients() {
         return this.getDisplayIngredients();
     }
 
@@ -140,6 +142,7 @@ public final class GenericRecipe extends CustomRecipe {
         return this.width <= width && this.height <= height && (this.getRoom() >= 0 || width * height - this.width * this.height + this.getRoom() >= 0);
     }
 
+    // Tells us if the given inventory satisfies the recipe's input
     @Override
     public boolean matches(CraftingInput inventory, Level world) {
         if (!this.canCraftInDimensions(inventory.width(), inventory.height())) {
@@ -161,7 +164,6 @@ public final class GenericRecipe extends CustomRecipe {
         this.result = ItemStack.EMPTY;
         return false;
     }
-
 
     private ItemStack getResult(final CraftingInput inventory, final int originX, final int originY, final IntUnaryOperator funcX) {
         final MatchResultRegular[] match = new MatchResultRegular[this.ingredients.length];
@@ -237,14 +239,14 @@ public final class GenericRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public @NotNull ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         final ItemStack result = this.result;
         return result.isEmpty() ? result : result.copy();
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries) {
-        return this.output;
+    public @NotNull ItemStack getResultItem(HolderLookup.Provider registries) {
+        return this.output.copy();
     }
 
     public interface MatchResult<I extends GenericIngredient<I, M>, M extends MatchResult<I, M>> {

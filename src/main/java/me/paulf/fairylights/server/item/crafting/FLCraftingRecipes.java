@@ -15,6 +15,7 @@ import me.paulf.fairylights.util.OreDictUtils;
 import me.paulf.fairylights.util.Utils;
 import me.paulf.fairylights.util.crafting.GenericRecipe;
 import me.paulf.fairylights.util.crafting.GenericRecipeBuilder;
+import me.paulf.fairylights.util.crafting.HangingLightsRecipe;
 import me.paulf.fairylights.util.crafting.ingredient.*;
 import me.paulf.fairylights.util.styledstring.StyledString;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -43,7 +44,7 @@ public final class FLCraftingRecipes {
 
     public static final DeferredRegister<RecipeSerializer<?>> REG = DeferredRegister.create(FairyLights.ID, Registries.RECIPE_SERIALIZER);
 
-    public static final RegistrySupplier<RecipeSerializer<GenericRecipe>> HANGING_LIGHTS = REG.register("crafting_special_hanging_lights", () -> new SimpleCraftingRecipeSerializer<>(FLCraftingRecipes::createHangingLights));
+    public static final RegistrySupplier<RecipeSerializer<HangingLightsRecipe>> HANGING_LIGHTS = REG.register("crafting_special_hanging_lights", () -> new SimpleCraftingRecipeSerializer<>(FLCraftingRecipes::createHangingLights));
 
     public static final RegistrySupplier<RecipeSerializer<GenericRecipe>> HANGING_LIGHTS_AUGMENTATION = REG.register("crafting_special_hanging_lights_augmentation", () -> new SimpleCraftingRecipeSerializer<>(FLCraftingRecipes::createHangingLightsAugmentation));
 
@@ -214,35 +215,47 @@ public final class FLCraftingRecipes {
             .build();
     }
 
-    private static GenericRecipe createHangingLights(CraftingBookCategory craftingBookCategory) {
-        return new GenericRecipeBuilder(HANGING_LIGHTS, FLItems.HANGING_LIGHTS.get())
+    private static HangingLightsRecipe createHangingLights(CraftingBookCategory craftingBookCategory) {
+        return new HangingLightsRecipe(HANGING_LIGHTS);
+
+        /*return new GenericRecipeBuilder(HANGING_LIGHTS, FLItems.HANGING_LIGHTS.get())
             .withShape("I-I")
             .withIngredient('I', ConventionalItemTags.IRON_INGOTS)
             .withIngredient('-', ConventionalItemTags.STRINGS)
-            .withAuxiliaryIngredient(new LightIngredient(true))
-            .withAuxiliaryIngredient(new InertBasicAuxiliaryIngredient(LazyTagIngredient.of(Tags.Items.DYES_WHITE), false, 1) {
-                @Override
-                public ImmutableList<ImmutableList<ItemStack>> getInput(final ItemStack output) {
-                    return output.has(FLComponents.STRING_TYPE) && output.get(FLComponents.STRING_TYPE) == StringTypes.WHITE_STRING.get() ? super.getInput(output) : ImmutableList.of();
-                }
+                .withAuxiliaryIngredient(new LightIngredient(true))
+                .withAuxiliaryIngredient(new InertBasicAuxiliaryIngredient(LazyTagIngredient.of(Tags.Items.DYES_WHITE), false, 1) {
+                    @Override
+                    public ImmutableList<ImmutableList<ItemStack>> getInput(final ItemStack output) {
+                        // Ensure this doesn't return an empty input
+                        if (output.has(FLComponents.STRING_TYPE) && output.get(FLComponents.STRING_TYPE) == StringTypes.WHITE_STRING.get()) {
+                            ImmutableList<ImmutableList<ItemStack>> input = super.getInput(output);
+                            if (input.isEmpty() || input.getFirst().isEmpty()) {
+                                throw new IllegalStateException("Empty input detected for HangingLights recipe");
+                            }
+                            return input;
+                        } else {
+                            // Fallback case if condition is not met
+                            return ImmutableList.of(ImmutableList.of(new ItemStack(Items.IRON_INGOT)));  // Return a valid fallback
+                        }
+                    }
 
-                @Override
-                public void present(final ModifiableDataComponentMap nbt) {
-                    nbt.set(FLComponents.STRING_TYPE, StringTypes.WHITE_STRING.get());
-                }
+                    @Override
+                    public void present(final ModifiableDataComponentMap nbt) {
+                        nbt.set(FLComponents.STRING_TYPE, StringTypes.WHITE_STRING.get());
+                    }
 
-                @Override
-                public void absent(final ModifiableDataComponentMap nbt) {
-                    nbt.set(FLComponents.STRING_TYPE, StringTypes.BLACK_STRING.get());
-                }
+                    @Override
+                    public void absent(final ModifiableDataComponentMap nbt) {
+                        nbt.set(FLComponents.STRING_TYPE, StringTypes.BLACK_STRING.get());
+                    }
 
-                @Override
-                public void addTooltip(final List<Component> tooltip) {
-                    super.addTooltip(tooltip);
-                    tooltip.add(Utils.formatRecipeTooltip("recipe.fairylights.hangingLights.string"));
-                }
-            })
-            .build();
+                    @Override
+                    public void addTooltip(final List<Component> tooltip) {
+                        super.addTooltip(tooltip);
+                        tooltip.add(Utils.formatRecipeTooltip("recipe.fairylights.hangingLights.string"));
+                    }
+                })
+            .build();*/
     }
 
     /*
