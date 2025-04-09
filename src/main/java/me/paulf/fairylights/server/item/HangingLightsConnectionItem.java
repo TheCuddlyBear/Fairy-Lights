@@ -29,6 +29,7 @@ public final class HangingLightsConnectionItem extends ConnectionItem {
         }
         if (stack.has(FLComponents.PATTERN)) {
             var patternStacks = stack.get(FLComponents.PATTERN);
+            assert patternStacks != null;
             if (!patternStacks.isEmpty()) {
                 tooltip.add(Component.empty());
             }
